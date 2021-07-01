@@ -10,15 +10,17 @@ const spriteH = 48;
 const shots = 3;
 let cycle = 0;
 
-let pY = 0;
-let pX = 0;
-let walkPic = 0;
-
 let bottomPressed = false;
 let direction = '';
 
 const canvasSize = 600;
 const picSize = 48;
+
+const centralPos = canvasSize / 2 - picSize / 2;
+
+let pX = centralPos;
+let pY = centralPos;
+let walkPic = 0;
 
 const img = document.createElement('img');
 img.src = characterWalk;
@@ -83,7 +85,7 @@ const getDirection = () => {
       walkPic = 144;
       break;
     case 'right':
-      if (pX >= canvasSize - (picSize)) {
+      if (pX >= canvasSize - picSize) {
         break;
       }
 
@@ -99,8 +101,7 @@ const getDirection = () => {
       walkPic = 48;
       break;
     default:
-      pY = 0;
-      pX = 0;
+      return { pX, pY, walkPic };
   }
 
   cycle = (cycle + 1) % shots;
@@ -108,7 +109,7 @@ const getDirection = () => {
   return { pX, pY, walkPic };
 };
 
-const drawImage = (xPos = 0, yPos = 0, walkPos = 0) => {
+const drawImage = (xPos, yPos, walkPos = 0) => {
   ctx.clearRect(0, 0, 600, 600);
   ctx.drawImage(img, cycle * spriteW, walkPos, spriteW, spriteH, xPos, yPos, 48, 48);
 };
