@@ -1,5 +1,10 @@
-import './index.scss';
+import Background from '../public/background';
 import characterWalk from './assets/characterWalk.png';
+
+import './index.scss';
+
+const background = new Background();
+background.init();
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
