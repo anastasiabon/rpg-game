@@ -1,4 +1,4 @@
-import ClientGame from './client/ClinetGame';
+import ClientGame from './client/ClientGame';
 import characterWalk from './assets/characterWalk.png';
 // import terrainAtlas from './assets/terrain.png';
 // import worldCfg from './configs/world.json';

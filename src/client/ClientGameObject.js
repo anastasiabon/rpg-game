@@ -10,6 +10,7 @@ class ClientGameObject extends MovableObject {
     const {
       cell: { world },
     } = cfg;
+
     const gameObjs = world.game.gameObjects;
     const objCfg = typeof cfg.objCfg === 'string' ? { type: cfg.objCfg } : cfg.objCfg;
 
@@ -85,7 +86,6 @@ class ClientGameObject extends MovableObject {
 
     const { x, y, width, height, world } = this;
     const { engine } = world;
-
     const { sprite, frame, type } = this.spriteCfg;
 
     const spriteFrame = type === 'static' ? frame : this.getCurrentFrame(time);

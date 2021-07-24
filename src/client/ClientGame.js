@@ -48,9 +48,7 @@ export default class ClientGame {
   onKeyDown(dCol, dRow, dir) {
     return (keydown) => {
       if (keydown && this.player && this.player.motionProgress === 1) {
-        const canMove = this.player.moveByCellCoord(dCol, dRow, (cell) => (
-          cell.findObjectsByType('grass').length
-        ));
+        const canMove = this.player.moveByCellCoord(dCol, dRow, (cell) => cell.findObjectsByType('grass').length);
 
         if (canMove) {
           this.player.setState(dir);
