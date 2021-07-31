@@ -91,7 +91,7 @@ class ClientWorld extends PositionedObject {
     let range = rangeCells;
 
     if (!range) {
-      range = { // eslint-disable-line
+      range = {
         startCell: this.cellAt(0, 0),
         endCell: this.cellAt(worldWidth - 1, worldHeight - 1),
       };
