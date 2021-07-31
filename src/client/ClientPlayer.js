@@ -4,9 +4,9 @@ class ClientPlayer extends ClientGameObject {
   constructor(cfg) {
     super(cfg);
 
-    this.playerName = 'Tom';
-
     const world = cfg.cell.world;
+
+    this.playerName = world.game.playerName;
 
     world.game.setPlayer(this);
   }
