@@ -25,8 +25,8 @@ class ClientCell extends PositionedObject {
   initGameObjects() {
     const { cellCfg } = this;
 
-    this.objects = cellCfg.map((layer, layerId) =>
-      layer.map((objCfg) => new ClientGameObject({ cell: this, objCfg, layerId })), // eslint-disable-line
+    this.objects = cellCfg.map(
+      (layer, layerId) => layer.map((objCfg) => new ClientGameObject({ cell: this, objCfg, layerId })), // eslint-disable-line
     ); // eslint-disable-line
   }
 

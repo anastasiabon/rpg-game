@@ -43,14 +43,55 @@ class ClientWorld extends PositionedObject {
   }
 
   render(time) {
-    const { levelCfg, map, worldWidth, worldHeight } = this;
+    const { levelCfg } = this;
 
     for (let layerId = 0; layerId < levelCfg.layers.length; layerId++) {
-      for (let row = 0; row < worldHeight; row++) {
-        for (let col = 0; col < worldWidth; col++) {
-          if (map[row][col]) {
-            map[row][col].render(time, layerId);
-          }
+      const layer = levelCfg.layers[layerId];
+
+      if (layer.isStatic) {
+        this.renderStaticLayer(time, layer, layerId);
+      } else {
+        this.renderDynamicLayer(time, layerId);
+      }
+    }
+  }
+
+  renderStaticLayer(time, layer, layerId) {
+    const { engine } = this;
+    const { camera } = engine;
+
+    const layerName = `static_layer_${layerId}`;
+    const cameraPos = camera.worldBounds();
+
+    if (!layer.isRendered) {
+      engine.addCanvas(layerName, this.width, this.height);
+      engine.switchCanvas(layerName);
+
+      camera.moveTo(0, 0, false);
+
+      this.renderDynamicLayer(time, layerId);
+
+      camera.moveTo(cameraPos.x, cameraPos.y, false);
+
+      engine.switchCanvas('main');
+      layer.isRendered = true; // eslint-disable-line no-param-reassign
+    }
+
+    engine.renderCanvas(layerName, cameraPos, {
+      x: 0,
+      y: 0,
+      width: cameraPos.width,
+      height: cameraPos.height,
+    });
+  }
+
+  renderDynamicLayer(time, layerId) {
+    const { map, worldWidth, worldHeight } = this;
+
+    for (let row = 0; row < worldHeight; row++) {
+      for (let col = 0; col < worldWidth; col++) {
+        if (map[row][col]) {
+          map[row][col].render(time, layerId);
         }
       }
     }
