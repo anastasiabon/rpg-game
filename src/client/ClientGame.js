@@ -22,17 +22,22 @@ export default class ClientGame {
   }
 
   createEngine() {
-    return new ClientEngine(document.getElementById(this.cfg.tagId));
+    return new ClientEngine(document.getElementById(this.cfg.tagId), this);
   }
 
   createWorld() {
     return new ClientWorld(this, this.engine, levelCfg);
   }
 
+  getWorld() {
+    return this.world;
+  }
+
   initEngine() {
     this.engine.loadSprites(sprites).then(() => {
       this.world.init();
       this.engine.on('render', (_, time) => {
+        this.engine.camera.focusAtGameObject(this.player);
         this.world.render(time);
       });
       this.engine.start();
@@ -40,20 +45,25 @@ export default class ClientGame {
     });
   }
 
-  onKeyDown(dCol, dRow) {
+  onKeyDown(dCol, dRow, dir) {
     return (keydown) => {
-      if (keydown) {
-        this.player.moveByCellCoord(dCol, dRow, (cell) => cell.findObjectsByType('grass').length);
+      if (keydown && this.player && this.player.motionProgress === 1) {
+        const canMove = this.player.moveByCellCoord(dCol, dRow, (cell) => cell.findObjectsByType('grass').length);
+
+        if (canMove) {
+          this.player.setState(dir);
+          this.player.once('motion-stopped', () => this.player.setState('main'));
+        }
       }
     };
   }
 
   initKeys() {
     this.engine.input.onKey({
-      ArrowLeft: this.onKeyDown(-1, 0),
-      ArrowRight: this.onKeyDown(1, 0),
-      ArrowDown: this.onKeyDown(0, 1),
-      ArrowUp: this.onKeyDown(0, -1),
+      ArrowLeft: this.onKeyDown(-1, 0, 'left'),
+      ArrowRight: this.onKeyDown(1, 0, 'right'),
+      ArrowDown: this.onKeyDown(0, 1, 'down'),
+      ArrowUp: this.onKeyDown(0, -1, 'up'),
     });
   }
 

@@ -18,5 +18,7 @@ module.exports = {
     "no-plusplus": 0,
     "no-irregular-whitespace": 0,
     "max-len": 0,
+    "no-bitwise": 0,
+    "no-return-assign": 0,
   },
 };
