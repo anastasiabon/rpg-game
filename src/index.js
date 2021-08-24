@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 import ClientGame from './client/ClientGame';
 import './index.scss';
-import {getTime} from "./common/util";
+import { getTime } from './common/util';
 
 window.addEventListener('load', () => {
   const socket = io('https://jsprochat.herokuapp.com');
@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
       $formName.removeEventListener('submit', submitName);
       $startGameBlock.remove();
     }
-  }
+  };
 
   $formName.addEventListener('submit', submitName);
 
@@ -42,21 +42,21 @@ window.addEventListener('load', () => {
 
       $input.value = '';
     }
-  })
+  });
 
   socket.on('chat connection', (data) => {
     $message.insertAdjacentHTML('beforeend',
-      `<p><strong>${getTime(data.time)}</strong> - ${data.msg}</p>`)
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: green">${data.msg}</span></p>`);
   });
 
   socket.on('chat disconnection', (data) => {
     $message.insertAdjacentHTML('beforeend',
-      `<p><strong>${getTime(data.time)}</strong> - ${data.msg}</p>`)
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: red">${data.msg}</span></p>`);
   });
 
   socket.on('chat message', (data) => {
-    $message.insertAdjacentHTML('beforeend',
-      `<p><strong>${getTime(data.time)}</strong> - ${data.msg}</p>`)
+    const msg = `<p><strong>${getTime(data.time)}</strong> - <span style="color: blue">${data.name}:</span> ${data.msg}</p>`;
+
+    $message.insertAdjacentHTML('beforeend', msg);
   });
 });
-

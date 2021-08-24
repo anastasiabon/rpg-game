@@ -25,5 +25,7 @@ const normalize = (num) => (num.toString().length > 1 ? num : `0${num}`);
 
 export function getTime(date) {
   const convertDate = new Date(date);
-  return `${normalize(convertDate.getHours())}:${normalize(convertDate.getMinutes())}:${normalize(convertDate.getSeconds())}`;
+  return `${normalize(convertDate.getHours())}:${normalize(convertDate.getMinutes())}:${normalize(
+    convertDate.getSeconds(),
+  )}`;
 }
