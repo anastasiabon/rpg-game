@@ -5,9 +5,10 @@ import levelCfg from '../configs/world.json';
 import gameObjects from '../configs/gameObjects.json';
 
 export default class ClientGame {
-  constructor(cfg) {
+  constructor(cfg, playerName) {
     Object.assign(this, {
       cfg,
+      playerName,
       gameObjects,
       player: null,
     });
@@ -69,7 +70,17 @@ export default class ClientGame {
 
   static init(cfg) {
     if (!ClientGame.game) {
-      ClientGame.game = new ClientGame(cfg);
+      const $startGameBlock = document.querySelector('.start-game');
+      const $form = document.getElementById('nameForm');
+      const $input = document.getElementById('name');
+
+      $form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        $startGameBlock.style.display = 'none';
+
+        ClientGame.game = new ClientGame(cfg, $input.value);
+      });
     }
   }
 }

@@ -20,5 +20,8 @@ module.exports = {
     "max-len": 0,
     "no-bitwise": 0,
     "no-return-assign": 0,
+    "implicit-arrow-linebreak": 0,
+    "function-paren-newline": 0,
+    "prefer-destructuring": 0,
   },
 };
