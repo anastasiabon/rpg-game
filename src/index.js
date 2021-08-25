@@ -34,28 +34,61 @@ window.addEventListener('load', () => {
 
   $formName.addEventListener('submit', submitName);
 
+  let userId = '';
+
   $form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if ($input.value) {
-      socket.emit('chat message', $input.value);
+      const newSocket = socket.emit('chat message', $input.value);
+
+      userId = newSocket.id;
 
       $input.value = '';
     }
   });
 
   socket.on('chat connection', (data) => {
-    $message.insertAdjacentHTML('beforeend',
-      `<p><strong>${getTime(data.time)}</strong> - <span style="color: green">${data.msg}</span></p>`);
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: green">${data.msg}</span></p>`,
+    );
   });
 
   socket.on('chat disconnection', (data) => {
-    $message.insertAdjacentHTML('beforeend',
-      `<p><strong>${getTime(data.time)}</strong> - <span style="color: red">${data.msg}</span></p>`);
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: red">${data.msg}</span></p>`,
+    );
+  });
+
+  socket.on('chat online', (data) => {
+    let players = [];
+
+    data.names.forEach((player) => {
+      if (player.name) {
+        players.push(name);
+      }
+    })
+
+    const msg = players.length > 1 ? 'players are' : 'player is';
+
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p>${players.length} ${msg} online</p>`,
+    );
   });
 
   socket.on('chat message', (data) => {
-    const msg = `<p><strong>${getTime(data.time)}</strong> - <span style="color: blue">${data.name}:</span> ${data.msg}</p>`;
+    let style = '';
+
+    if (userId === data.id) {
+      style = 'color:blue';
+    }
+
+    const msg = `<p><strong>${getTime(data.time)}</strong> - <span style=${style}>${data.name}:</span> ${
+      data.msg
+    }</p>`;
 
     $message.insertAdjacentHTML('beforeend', msg);
   });
