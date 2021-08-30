@@ -1,125 +1,95 @@
+import { io } from 'socket.io-client';
 import ClientGame from './client/ClientGame';
-import characterWalk from './assets/characterWalk.png';
-// import terrainAtlas from './assets/terrain.png';
-// import worldCfg from './configs/world.json';
-// import sprites from './configs/sprites';
-
 import './index.scss';
+import { getTime } from './common/util';
 
 window.addEventListener('load', () => {
-  ClientGame.init({ tagId: 'game' });
-});
+  const socket = io('https://jsprochat.herokuapp.com');
 
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+  const $startGameBlock = document.querySelector('.start-game');
+  const $formName = document.getElementById('nameForm');
+  const $inputName = document.getElementById('name');
 
-const spriteW = 48;
-const spriteH = 48;
+  const $chatWrap = document.querySelector('.chat-wrap');
+  const $form = document.getElementById('form');
+  const $input = document.getElementById('input');
+  const $message = document.querySelector('.message');
 
-// const terrain = document.createElement('img');
-// terrain.src = terrainAtlas;
-//
-// terrain.addEventListener('load', () => {
-//   const { map } = worldCfg;
-//   map.forEach((cfgRow, y) => {
-//     cfgRow.forEach((cfgCell, x) => {
-//       const [sX, sY, sW, sH] = sprites.terrain[cfgCell[0]].frames[0];
-//       ctx.drawImage(terrain, sX, sY, sW, sH, x * spriteW, y * spriteH, spriteW, spriteH);
-//     })
-//   })
-// });
+  const submitName = (e) => {
+    e.preventDefault();
 
-const shots = 3;
-let cycle = 0;
+    if ($inputName.value) {
+      ClientGame.game = new ClientGame({
+        tagId: 'game',
+        playerName: $inputName.value,
+      });
+      socket.emit('start', $inputName.value);
 
-let buttonPressed = null;
+      $chatWrap.style.display = 'block';
 
-const picSize = 48;
+      $formName.removeEventListener('submit', submitName);
+      $startGameBlock.remove();
+    }
+  };
 
-const centralPos = canvas.width / 2 - picSize / 2;
+  $formName.addEventListener('submit', submitName);
 
-let pX = centralPos;
-let pY = centralPos;
-let walkPic = 0;
+  let userId = '';
 
-const img = document.createElement('img');
-img.src = characterWalk;
+  $form.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-function keyDownHandler(e) {
-  if (e.key === 'Down' || 'ArrowDown' || 'Up' || 'ArrowUp' || 'Right' || 'ArrowRight' || 'Left' || 'ArrowLeft') {
-    buttonPressed = e.key;
-  }
-}
+    if ($input.value) {
+      const newSocket = socket.emit('chat message', $input.value);
 
-function keyUpHandler(e) {
-  if (e.key === 'Down' || 'ArrowDown' || 'Up' || 'ArrowUp' || 'Right' || 'ArrowRight' || 'Left' || 'ArrowLeft') {
-    buttonPressed = null;
-  }
-}
+      userId = newSocket.id;
 
-document.addEventListener('keydown', keyDownHandler);
-document.addEventListener('keyup', keyUpHandler);
+      $input.value = '';
+    }
+  });
 
-const getDirection = () => {
-  if (!buttonPressed) {
-    return { pX, pY };
-  }
+  socket.on('chat connection', (data) => {
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: green">${data.msg}</span></p>`,
+    );
+  });
 
-  const moveRange = 10;
+  socket.on('chat disconnection', (data) => {
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - <span style="color: red">${data.msg}</span></p>`,
+    );
+  });
 
-  switch (buttonPressed) {
-    case 'ArrowDown':
-      if (pY >= canvas.height - picSize) {
-        break;
+  socket.on('chat online', (data) => {
+    let players = [];
+
+    data.names.forEach((player) => {
+      if (player.name) {
+        players.push(name);
       }
+    })
 
-      pY += moveRange;
-      walkPic = 0;
-      break;
-    case 'ArrowUp':
-      if (pY <= 0) {
-        break;
-      }
+    const msg = players.length > 1 ? 'players are' : 'player is';
 
-      pY -= moveRange;
-      walkPic = picSize * 3;
-      break;
-    case 'ArrowRight':
-      if (pX >= canvas.width - picSize) {
-        break;
-      }
+    $message.insertAdjacentHTML(
+      'beforeend',
+      `<p>${players.length} ${msg} online</p>`,
+    );
+  });
 
-      pX += moveRange;
-      walkPic = picSize * 2;
-      break;
-    case 'ArrowLeft':
-      if (pX <= 0) {
-        break;
-      }
+  socket.on('chat message', (data) => {
+    let style = '';
 
-      pX -= moveRange;
-      walkPic = picSize;
-      break;
-    default:
-      return { pX, pY, walkPic };
-  }
+    if (userId === data.id) {
+      style = 'color:blue';
+    }
 
-  cycle = (cycle + 1) % shots;
+    const msg = `<p><strong>${getTime(data.time)}</strong> - <span style=${style}>${data.name}:</span> ${
+      data.msg
+    }</p>`;
 
-  return { pX, pY, walkPic };
-};
-
-const drawImage = (xPos, yPos, walkPos = 0) => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, cycle * spriteW, walkPos, spriteW, spriteH, xPos, yPos, picSize, picSize);
-};
-
-const walk = (timestamp) => {
-  const { pX: xPos, pY: yPos, walkPic: walkPos } = getDirection();
-  drawImage(xPos, yPos, walkPos);
-  window.requestAnimationFrame(walk);
-};
-
-img.addEventListener('load', () => {
-  window.requestAnimationFrame(walk);
+    $message.insertAdjacentHTML('beforeend', msg);
+  });
 });

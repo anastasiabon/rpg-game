@@ -70,17 +70,7 @@ export default class ClientGame {
 
   static init(cfg) {
     if (!ClientGame.game) {
-      const $startGameBlock = document.querySelector('.start-game');
-      const $form = document.getElementById('nameForm');
-      const $input = document.getElementById('name');
-
-      $form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        $startGameBlock.style.display = 'none';
-
-        ClientGame.game = new ClientGame(cfg, $input.value);
-      });
+      ClientGame.game = new ClientGame(cfg);
     }
   }
 }
